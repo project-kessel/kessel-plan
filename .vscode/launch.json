@@ -9,7 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "exec",
-            "program": "schemagenerator",
+            "program": "ksl-plan",
             "args": ["import-service", "-input=bootstrap.yaml", "-output=output.yaml", "-rbac-config=../rbac-config/configs/prod/permissions/", "-svc=inventory"]
         }
     ]

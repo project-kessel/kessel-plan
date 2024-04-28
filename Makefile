@@ -1,4 +1,4 @@
-BINARY_NAME := kessel-plan
+BINARY_NAME := ksl-plan
 
 # Default target
 all: $(BINARY_NAME)
