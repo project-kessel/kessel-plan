@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 func addResourcePermissions(app string, resourceType string, permissions []string) error {
@@ -36,7 +37,19 @@ func importRBACService(rbacPath, svcName string) error {
 }
 
 func createNewFile(path string) error {
-	return os.WriteFile(path, []byte(baselineSchema), 0600)
+	abs, err := filepath.Abs(path)
+	if err != nil {
+		return err
+	}
+	_, err = os.Stat(abs)
+	if os.IsNotExist(err) { // Expect an error that the file doesn't exist, and if not, create it
+		return storeEmpySchema(abs)
+	} else if err != nil {
+		return err // If there's a different error, something's wrong, pass it through
+	} else { // If there's NO error, the file exists, print and abort
+		fmt.Printf("Bootstrap file '%s' already exists. Use -output=<path/to/filename> to specify a different path to create a new bootstrap file.\n", abs)
+		return nil
+	}
 }
 
 var inputSchemaFile string
@@ -54,7 +67,7 @@ func main() {
 	addGlobalParameters(importService)
 
 	newFile := flag.NewFlagSet("new", flag.ExitOnError)
-	newFilePath := newFile.String("path", "bootstrap.yaml", "The location to store the empty bootstrap file.")
+	newFilePath := newFile.String("output", "bootstrap.yaml", "The location to store the empty bootstrap file.")
 
 	if len(os.Args) < 2 {
 		print("Please specify a subcommand: new, add-permissions, import-service")
@@ -64,19 +77,23 @@ func main() {
 	switch os.Args[1] {
 	case "new":
 		newFile.Parse(os.Args[2:])
-		createNewFile(*newFilePath)
+		err := createNewFile(*newFilePath)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 	case "add-permissions":
 		addPermissions.Parse(os.Args[2:])
 		err := addResourcePermissions(*app, *res, addPermissions.Args())
 		if err != nil {
-			fmt.Print(err)
+			fmt.Println(err)
 			return
 		}
 	case "import-service":
 		importService.Parse(os.Args[2:])
 		err := importRBACService(*rbacPath, *rbacSvc)
 		if err != nil {
-			fmt.Print(err)
+			fmt.Println(err)
 			return
 		}
 	}

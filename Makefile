@@ -4,8 +4,8 @@ BINARY_NAME := ksl-plan
 all: $(BINARY_NAME)
 
 # Rule for building the binary
-$(BINARY_NAME): *.go
-	@go build -o $(BINARY_NAME) $^
+$(BINARY_NAME): *.go empty_bootstrap.yaml
+	@go build -o $(BINARY_NAME) *.go
 
 # Clean the workspace
 clean:

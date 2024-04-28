@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 
+	_ "embed"
+
 	"github.com/authzed/spicedb/pkg/namespace"
 	core "github.com/authzed/spicedb/pkg/proto/core/v1"
 	"github.com/authzed/spicedb/pkg/schemadsl/compiler"
@@ -151,49 +153,9 @@ func cleanNameForSchemaCompatibility(name string) string {
 	return name
 }
 
-var baselineSchema string = `
-schema: |+
-    definition user {}
+//go:embed empty_bootstrap.yaml
+var emptySchema string
 
-    definition group {
-        relation member: user | group#member
-    }
-
-    definition role {}
-
-    definition role_binding {
-        relation subject : user | group#member
-        relation granted: role
-    }
-
-    definition realm {
-        relation user_grant: role_binding
-    }
-
-    definition organization {
-        relation realm: realm
-        relation user_grant: role_binding
-
-        relation entitlement_grant: entitlement_set | entitlement_binding
-
-        permission content_provider = entitlement_grant->content_provider
-    }
-
-    definition workspace {
-        relation parent: workspace | organization
-        relation user_grant: role_binding
-        relation entitlement_grant: entitlement_binding
-    }
-
-    definition entitlement_set {
-        relation provider: entitlement_set
-    }
-
-    definition entitlement_binding {
-        relation arbiter: entitlement_set | entitlement_binding
-        relation grant: entitlement_set
-    }
-
-relationships: |
-
-`
+func storeEmpySchema(path string) error {
+	return os.WriteFile(path, []byte(emptySchema), 0644)
+}

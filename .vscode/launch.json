@@ -10,7 +10,9 @@
             "request": "launch",
             "mode": "exec",
             "program": "ksl-plan",
-            "args": ["import-service", "-input=bootstrap.yaml", "-output=output.yaml", "-rbac-config=../rbac-config/configs/prod/permissions/", "-svc=inventory"]
+            //"args": ["new"]
+            "args": ["add-permissions", "-svc=space-traffic-control", "-res=landing-bay", "enter", "approve-landing", "approve-departure"]
+            //"args": ["import-service", "-input=bootstrap.yaml", "-output=output.yaml", "-rbac-config=../rbac-config/configs/prod/permissions/", "-svc=inventory"]
         }
     ]
 }
