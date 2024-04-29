@@ -5,10 +5,16 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
-func addResourcePermissions(app string, resourceType string, permissions []string) error {
+func addResourcePermissions(definition string, permissions []string) error {
 	s, err := load(inputSchemaFile)
+	if err != nil {
+		return err
+	}
+
+	app, resourceType, err := splitDefinition(definition)
 	if err != nil {
 		return err
 	}
@@ -57,8 +63,7 @@ var outputSchemaFile string
 
 func main() {
 	addPermissions := flag.NewFlagSet("add-permissions", flag.ExitOnError)
-	app := addPermissions.String("svc", "", "The service the permission applies to, used as a prefix in definition names.")
-	res := addPermissions.String("res", "", "The resource type the permission applies to. Will be created if not present.")
+	definition := addPermissions.String("res", "", "The resource type the permission applies to in the form <service_name>/<resource_type>. Will be created if not present.")
 	addGlobalParameters(addPermissions)
 
 	importService := flag.NewFlagSet("import-service", flag.ExitOnError)
@@ -84,7 +89,7 @@ func main() {
 		}
 	case "add-permissions":
 		addPermissions.Parse(os.Args[2:])
-		err := addResourcePermissions(*app, *res, addPermissions.Args())
+		err := addResourcePermissions(*definition, addPermissions.Args())
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -102,4 +107,14 @@ func main() {
 func addGlobalParameters(fs *flag.FlagSet) {
 	fs.StringVar(&inputSchemaFile, "input", "bootstrap.yaml", "The bootstrap yaml file to load for editing.")
 	fs.StringVar(&outputSchemaFile, "output", "bootstrap.yaml", "Where to store the modifed bootstrap yaml. Set to the input path to overwrite.")
+}
+
+func splitDefinition(definition string) (app string, resourcetype string, err error) {
+	parts := strings.Split(definition, "/")
+
+	if len(parts) != 2 {
+		return "", "", fmt.Errorf("resource type not well-formed, should be <service_name>/<resource_type>: %s", definition)
+	}
+
+	return parts[0], parts[1], nil
 }

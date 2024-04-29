@@ -12,7 +12,7 @@
             "program": "ksl-plan",
             //"args": ["new"]
             "args": ["add-permissions", "-svc=space-traffic-control", "-res=landing-bay", "enter", "approve-landing", "approve-departure"]
-            //"args": ["import-service", "-input=bootstrap.yaml", "-output=output.yaml", "-rbac-config=../rbac-config/configs/prod/permissions/", "-svc=inventory"]
+            //"args": ["import-service", "-input=bootstrap.yaml", "-output=output.yaml", "-rbac-config=../../rbac-config/configs/prod/permissions/", "-svc=inventory"]
         }
     ]
 }

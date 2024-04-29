@@ -13,4 +13,4 @@ If you do, it can be referenced from any sub-command using the `-input=<path to 
 
 To add permissions to your Kessel system, use the `ksl-plan add-permissions` command (see `ksl-plan add-permissions --help` for details) which allows you to add new resource types and permissions as well as adding permissions to existing resource types for new and existing services. All changes are additive.
 
-For example, to add a concept of users of the space-traffic-control service being able to be granted access to enter, or to approve landings and departures for landing-bays in a given workspace, you could run `./ksl-plan add-permissions -svc=space-traffic-control -res=landing-bay enter approve-landing approve-departure`
+For example, to add a concept of users of the space-traffic-control service being able to be granted access to enter, or to approve landings and departures for landing-bays in a given workspace, you could run `./ksl-plan add-permissions -res=space-traffic-control/landing-bay enter approve-landing approve-departure`
