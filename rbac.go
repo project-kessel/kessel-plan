@@ -16,8 +16,9 @@ type Resource struct {
 }
 
 type Service struct {
-	Name      string
-	Resources []*Resource
+	Name             string
+	Resources        []*Resource
+	WildcardResource *Resource
 }
 
 func LoadService(rbacPath, svcName string) (*Service, error) {
@@ -40,10 +41,6 @@ func LoadService(rbacPath, svcName string) (*Service, error) {
 	}
 
 	for resName, perms := range data {
-		if resName == "*" {
-			continue
-		}
-
 		res := &Resource{
 			Name:        resName,
 			Permissions: make([]string, 0, len(perms)),
@@ -56,7 +53,11 @@ func LoadService(rbacPath, svcName string) (*Service, error) {
 			res.Permissions = append(res.Permissions, perm.Verb)
 		}
 
-		service.Resources = append(service.Resources, res)
+		if resName == "*" {
+			service.WildcardResource = res
+		} else {
+			service.Resources = append(service.Resources, res)
+		}
 	}
 
 	return service, nil

@@ -35,8 +35,13 @@ func importRBACService(rbacPath, svcName string) error {
 		return err
 	}
 
-	for _, resource := range service.Resources {
-		s.addOrExtendResourceType(service.Name, resource.Name, resource.Permissions)
+	if len(service.Resources) == 0 && service.WildcardResource != nil { //If service only specifies a wildcard resource
+		s.addWildcardResourceType(svcName, service.WildcardResource)
+		fmt.Printf("WARN: service '%s' does not define any resource types. Permissions will be applied to the workspace level only.\n", service.Name)
+	} else {
+		for _, resource := range service.Resources {
+			s.addOrExtendResourceType(service.Name, resource.Name, resource.Permissions)
+		}
 	}
 
 	return s.store(outputSchemaFile)
@@ -75,7 +80,7 @@ func main() {
 	newFilePath := newFile.String("output", "bootstrap.yaml", "The location to store the empty bootstrap file.")
 
 	if len(os.Args) < 2 {
-		print("Please specify a subcommand: new, add-permissions, import-service")
+		print("Please specify a subcommand: new, add-permissions, import-service\n")
 		return
 	}
 

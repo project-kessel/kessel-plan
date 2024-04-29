@@ -142,6 +142,18 @@ func (s *schema) addOrExtendResourceType(app string, resourceType string, permis
 	}
 }
 
+func (s *schema) addWildcardResourceType(app string, wildcard *Resource) {
+	app = cleanNameForSchemaCompatibility(app)
+	s.addPermission(fmt.Sprintf("%s_all_all", app))
+	for _, permission := range wildcard.Permissions {
+		if permission == "*" {
+			continue
+		}
+
+		s.addPermission(fmt.Sprintf("%s_all_%s", app, cleanNameForSchemaCompatibility(permission)))
+	}
+}
+
 func cleanNameForSchemaCompatibility(name string) string {
 	name = strings.ToLower(name)
 	name = strings.ReplaceAll(name, "-", "_")
